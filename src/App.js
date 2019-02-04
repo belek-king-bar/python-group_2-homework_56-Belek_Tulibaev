@@ -8,17 +8,18 @@ class App extends Component {
 
   state = {
         tasks: [
-            {id: 1, text: 'О себе 1'},
-            {id: 2, text: 'О себе 2'},
-            {id: 3, text: 'О себе 3'}
+            {id: 1, text: 'Написать код', status: false},
+            {id: 2, text: 'Поспать час', status: false},
+            {id: 3, text: 'Покушать', status: false}
         ],
-        currentTask: {text: ''},
+        currentTask: {id: '', text: '', status: false},
 
     };
 
 
   addTask = (event) => {
         event.preventDefault();
+
         let task = {...this.state.currentTask};
         const now = new Date();
         task.id = now.getTime();
@@ -26,7 +27,7 @@ class App extends Component {
         this.setState({
             ...this.state,
             tasks,
-            currentTask: {text: ''}
+            currentTask: {id: '', text: '', status: false}
         });
     };
 
@@ -45,7 +46,6 @@ class App extends Component {
     };
 
   changeTaskInput = (event) => {
-        const text = event.target.text;
         let value = event.target.value;
         let currentTask = {
             ...this.state.currentTask,
@@ -61,6 +61,17 @@ class App extends Component {
   isAddButtonDisabled = () => {
        return this.state.currentTask.text === '';
     };
+
+  isDone = (id) => {
+      let taskId = this.state.tasks.findIndex(task => {
+          return task.id === id
+      });
+
+      const tasks = [...this.state.tasks];
+      tasks[taskId].status = !this.state.tasks[taskId].status;
+
+      this.setState({tasks});
+  };
 
 
   render() {
@@ -81,6 +92,9 @@ class App extends Component {
                           key={task.id}
                           tasks={task.text}
                           onDelete={() => this.removeTask(task.id)}
+                          isTaskDone={() => this.isDone(task.id)}
+                          status = {task.status}
+                          id={task.id}
                       />
                   })}
 
