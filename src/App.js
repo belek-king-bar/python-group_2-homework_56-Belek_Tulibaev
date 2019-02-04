@@ -29,6 +29,7 @@ class App extends Component {
             tasks,
             currentTask: {id: '', text: '', status: false}
         });
+        console.log(this.state.currentTask)
     };
 
   removeTask = (id) => {
