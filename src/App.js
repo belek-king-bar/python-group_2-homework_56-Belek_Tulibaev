@@ -1,108 +1,118 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import './App.css';
-import AddTaskForm from './AddTaskForm/AddForm.js';
-import Task from './Task/Task.js';
+import Field from './components/Field/Field';
+import Cell from './components/Field/Cell/Cell';
+import Button from './components/Button/Button';
+import Counter from './components/Counter/Counter';
 
+
+// pass cell variable to Cell.js*
+
+const FIELD_SIZE = 6;
 
 class App extends Component {
+    constructor(props) {
+        super(props);
 
-  state = {
-        tasks: [
-            {id: 1, text: 'Написать код', status: false},
-            {id: 2, text: 'Поспать час', status: false},
-            {id: 3, text: 'Покушать', status: false}
-        ],
-        currentTask: {id: '', text: '', status: false},
-
-    };
-
-
-  addTask = (event) => {
-        event.preventDefault();
-
-        let task = {...this.state.currentTask};
-        const now = new Date();
-        task.id = now.getTime();
-        let tasks = [...this.state.tasks, task];
-        this.setState({
-            ...this.state,
-            tasks,
-            currentTask: {id: '', text: '', status: false}
-        });
-        console.log(this.state.currentTask)
-    };
-
-  removeTask = (id) => {
-        let taskId = this.state.tasks.findIndex(task => {
-            return task.id === id;
-        });
-
-        const tasks = [...this.state.tasks];
-        tasks.splice(taskId, 1);
-
-        this.setState({
-            ...this.state,
-            tasks
-        });
-    };
-
-  changeTaskInput = (event) => {
-        let value = event.target.value;
-        let currentTask = {
-            ...this.state.currentTask,
-            text: value
+        this.state = {
+            cells: this.generateCells(), // an array, inside the array we have an object
+            counter: 0,
+            isWin: false
         };
-        this.setState({
-            ...this.state,
-            currentTask
-        });
+
+
+    }
+
+
+    generateCells = () => {
+        let cells = [];
+        let cellsCount = FIELD_SIZE ** 2;
+
+        for (let i = 0; i < cellsCount; i++) {
+            cells.push({open: false, hasItem: false})
+        }
+
+        let randomIndex = Math.floor(Math.random() * cellsCount);
+        cells[randomIndex].hasItem = true;
+        return cells;
+
     };
 
+    openCell = (id) => {
+        //check if you found an 'O'
+        if (!this.state.isWin) {
+            let cell = {...this.state.cells[id]};
+            if (!cell.open) {
+                cell.open = true;
 
-  isAddButtonDisabled = () => {
-       return this.state.currentTask.text === '';
+                let cells = [...this.state.cells];
+                cells[id] = cell;
+
+                let state = {...this.state};
+                state.cells = cells;
+                state.counter = state.counter + 1;
+
+                this.setState(state);
+
+                // if you are found an element
+                if (cells[id].hasItem) {
+
+                    // pass is open as property to open cell, and change the state: (cells, counter, isWin)
+                    cells[id] = cell;
+                    let state = {...this.state};
+                    state.cells = cells;
+                    state.counter = state.counter + 1;
+                    state.isWin = true;
+
+                    this.setState(state);
+                }
+            }
+        }
     };
 
-  isDone = (id) => {
-      let taskId = this.state.tasks.findIndex(task => {
-          return task.id === id
-      });
+    resetGame = () => {
+        // unpacked state
+        // change counter
+        // close opened squares
+        // set changed state
 
-      const tasks = [...this.state.tasks];
-      tasks[taskId].status = !this.state.tasks[taskId].status;
+        let state = {...this.state};
+        state.counter = 0;
+        state.isWin = false; // to start the game from the beginning
+        let i = 0;
+        while (i < state.cells.length) {
+            if (state.cells[i].open) {
+                state.cells[i].open = false;
+            }
+            i++;
+        }
 
-      this.setState({tasks});
-  };
+        this.setState(state);
 
+    };
 
-  render() {
-    return (
-            <div className="App">
-                <div>
-                    <h2>Добавить задачу</h2>
-                    <AddTaskForm
-                        onChangeInput={this.changeTaskInput}
-                        onAddTask={this.addTask}
-                        isAddButtonDisabled={this.isAddButtonDisabled()}
-                    />
-                </div>
-                <div>
-
-                  {this.state.tasks.map((task) => {
-                      return <Task
-                          key={task.id}
-                          tasks={task.text}
-                          onDelete={() => this.removeTask(task.id)}
-                          isTaskDone={() => this.isDone(task.id)}
-                          status = {task.status}
-                          id={task.id}
-                      />
-                  })}
-
-                </div>
+    render() {
+        return (
+            <div className="container">
+                <Field>
+                    {this.state.cells.map((item, index) =>
+                        <Cell
+                            cell={item}
+                            key={index}
+                            click={() => this.openCell(index)}
+                        />
+                    )}
+                </Field>
+                <Counter
+                    counter={this.state.counter}
+                />
+                {this.state.isWin ? <p className="win_text">You won, Congrats!</p> : null}
+                <Button
+                    gameReset={this.resetGame}
+                />
             </div>
         );
-  }
+    }
 }
 
 export default App;
