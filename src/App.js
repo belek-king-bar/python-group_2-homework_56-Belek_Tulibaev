@@ -6,7 +6,7 @@ import Button from './components/Button/Button';
 import Counter from './components/Counter/Counter';
 
 
-// pass cell variable to Cell.js*
+
 
 const FIELD_SIZE = 6;
 
@@ -15,9 +15,9 @@ class App extends Component {
         super(props);
 
         this.state = {
-            cells: this.generateCells(), // an array, inside the array we have an object
+            cells: this.generateCells(),
             counter: 0,
-            isWin: false
+            checker: false
         };
 
 
@@ -39,8 +39,8 @@ class App extends Component {
     };
 
     openCell = (id) => {
-        //check if you found an 'O'
-        if (!this.state.isWin) {
+
+        if (!this.state.checker) {
             let cell = {...this.state.cells[id]};
             if (!cell.open) {
                 cell.open = true;
@@ -54,15 +54,14 @@ class App extends Component {
 
                 this.setState(state);
 
-                // if you are found an element
+
                 if (cells[id].hasItem) {
 
-                    // pass is open as property to open cell, and change the state: (cells, counter, isWin)
                     cells[id] = cell;
                     let state = {...this.state};
                     state.cells = cells;
                     state.counter = state.counter + 1;
-                    state.isWin = true;
+                    state.checker = true;
 
                     this.setState(state);
                 }
@@ -70,15 +69,11 @@ class App extends Component {
         }
     };
 
-    resetGame = () => {
-        // unpacked state
-        // change counter
-        // close opened squares
-        // set changed state
+    restartGame = () => {
 
         let state = {...this.state};
         state.counter = 0;
-        state.isWin = false; // to start the game from the beginning
+        state.checker = false;
         let i = 0;
         while (i < state.cells.length) {
             if (state.cells[i].open) {
@@ -106,9 +101,9 @@ class App extends Component {
                 <Counter
                     counter={this.state.counter}
                 />
-                {this.state.isWin ? <p className="win_text">You won, Congrats!</p> : null}
+                {this.state.checker ? <p className="win_text">Вы выиграли!</p> : null}
                 <Button
-                    gameReset={this.resetGame}
+                    gameReset={this.restartGame}
                 />
             </div>
         );
