@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
 import './App.css';
-import Field from './components/Field/Field';
-import Cell from './components/Field/Cell/Cell';
-import Button from './components/Button/Button';
-import Counter from './components/Counter/Counter';
+import Field from './Components/Field/Field';
+import Cell from './Components/Field/Cell/Cell';
+import Button from './Components/Button/Button';
+import Counter from './Components/Counter/Counter';
 
 
 
